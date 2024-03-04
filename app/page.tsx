@@ -1,14 +1,63 @@
+"use client";
+
 import Image from "next/image";
 import styles from "./page.module.css";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [isReady, setIsReady] = useState(false);
+  useEffect(() => {
+    // if ("serviceWorker" in navigator) {
+    const handleServiceWorker = async () => {
+      // const register = await navigator.serviceWorker.register("/sw.js");
+
+      // const subscription = await register.pushManager.subscribe({
+      //   userVisibleOnly: true,
+      //   applicationServerKey: "BJeFdPn35EBHJ_rR4x9vTL5NVPnLaYvJywIASm7bIxDDEMAN7Z31CSW3IvPixp7wiOdNGQIpwhq1xAse-vywO5c",
+      // });
+
+      // const subscription = navigator.serviceWorker
+
+      // const res = await fetch("http://localhost:4000/subscribe", {
+      //   method: "POST",
+      //   body: JSON.stringify(subscription),
+      //   headers: {
+      //     "content-type": "application/json",
+      //   },
+      // });
+
+      // const data = await res.json();
+      // console.log(data);
+
+      navigator.serviceWorker.ready.then(async (register) => {
+        console.log("READY !!");
+        setIsReady(true);
+        const subscription = await register.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey:
+            "BJeFdPn35EBHJ_rR4x9vTL5NVPnLaYvJywIASm7bIxDDEMAN7Z31CSW3IvPixp7wiOdNGQIpwhq1xAse-vywO5c",
+        });
+
+        const res = await fetch("https://web-push-server-seven.vercel.app/subscribe", {
+          method: "POST",
+          body: JSON.stringify(subscription),
+          headers: {
+            "content-type": "application/json",
+          },
+        });
+
+        const data = await res.json();
+        console.log(data);
+      });
+    };
+    handleServiceWorker();
+    // }
+  }, []);
+
   return (
     <main className={styles.main}>
       <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
+        <p>{isReady ? "READY" : "HMMM..."}</p>
         <div>
           <a
             href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
